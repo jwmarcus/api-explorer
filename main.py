@@ -3,7 +3,8 @@ import urllib3
 import json
 
 owner = "venmo"
-endpoint = f"/orgs/{owner}/repos"
+endpoint = f"orgs/{owner}/repos?per_page=100"
+
 
 def main():
     headers = {
@@ -12,13 +13,15 @@ def main():
     }
 
     http = urllib3.PoolManager()
-    r = http.request("GET", f"https://api.github.com{endpoint}", headers=headers)
+    r = http.request("GET", f"https://api.github.com/{endpoint}", headers=headers)
 
     if r.status == 200:
-        res_json = json.loads(r.data.decode("utf-8"))
-        # res_source = [x for x in res_json if not x["fork"]]
-        # print(json.dumps(res_json, indent=2, sort_keys=True))
-        print(r.headers)
+        res = json.loads(r.data.decode("utf-8"))
+        print("INFO: Saving json response")
+
+        with open("results.json", "w") as json_file:
+            json.dump(res, json_file)
+            print("INFO: json export complete")
     else:
         print(r.status)
         print(r.data)
